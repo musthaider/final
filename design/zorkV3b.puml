@@ -1,0 +1,68 @@
+' Zork III diagram b, spring 2024
+@startuml
+skinparam classAttributeIconSize 0
+skinparam padding 1
+skinparam nodesep 100
+skinparam link {
+    padding 50
+}
+hide circle
+
+class CommandFactory {
+    +parse(commmand : String) : Command
+}
+
+abstract class Command {
+    {abstract} ~execute() : String
+}
+
+"CommandFactory" ..> "Command" : <<instantiates>>
+
+together {
+class TakeCommand extends Command {
+    -itemName : String
+    ~execute() : String
+}
+
+class DropCommand extends Command {
+    -itemName : String
+    ~execute() : String
+}
+}
+
+class LookCommand extends Command {
+    ~execute() : String
+}
+
+class MovementCommand extends Command {
+    -dir : String
+    ~execute() : String
+}
+
+class SaveCommand extends Command {
+    -saveFilename : String
+    ~execute() : String
+}
+
+class InventoryCommand extends Command {
+    ~execute() : String
+}
+
+class UnknownCommand extends Command {
+    -bogusCommandString : String
+    ~execute() : String
+}
+
+
+class ItemSpecificCommand extends Command {
+    -verb : String
+    -noun : String
+    ~execute() : String
+}
+
+SaveCommand -[hidden]d TakeCommand
+DropCommand -[hidden]d LookCommand
+'"+Exit" -[hidden]d "+Room"
+'"+Dungeon" -[hidden]r "+Room"
+'"Interpreter" -[hidden]r "+Dungeon"
+@enduml

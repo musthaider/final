@@ -1,0 +1,70 @@
+' Zork III diagram a, spring 2024
+@startuml
+skinparam classAttributeIconSize 0
+skinparam padding 1
+skinparam nodesep 100
+skinparam link {
+    padding 50
+}
+hide circle
+
+class +Dungeon {
+    +Dungeon(filename: String)
+    +getItem(itemName : String) : Item
+    +add(item : Item) : void
+}
+
+class +Room {
+    ~getContents() : HashSet<Item>
+    ~getItemNamed(name : String) : Item
+    ~add(item : Item) : void
+    ~remove(item : Item) : void
+}
+
+class +NoItemException {
+}
+"+Dungeon" ..> "+NoItemException" : <<instantiates>>
+"GameState" ..> "+NoItemException" : <<instantiates>>
+"+Room" ..> "+NoItemException" : <<instantiates>>
+"+Item" ..> "+NoItemException" : <<instantiates>>
+
+class GameState {
+    {static} +instance() : GameState
+    ~getInventory() : ArrayList<Item>
+    ~addToInventory(item : Item) : void
+    ~removeFromInventory(item : Item) : void
+    ~getItemInVicinityNamed(name : String) : Item
+    ~getItemFromInventoryNamed(name : String) : Item
+    ~getItemsInRoom(room : Room) : HashSet<Item>  
+    ~addItemToRoom(item : Item, room : Room) : void
+    ~removeItemFromRoom(item : Item, room : Room) : void
+}
+
+class +Item {
+    -primaryName : String
+    -weight : int
+    -messages : Hashtable<String,String>
+    -aliases : HashSet<String>
+    +Item(s : Scanner)
+    +goesBy(name : String) : boolean
+    +getPrimaryName() : String
+    +getMessageForVerb(verb : String) : String
+    +toString() : String
+    +getWeight() : int
+}
+
+"GameState" o-- "-inventory *" "+Item"
+note on link
+    ArrayList
+end note
+"GameState" o-- "-roomContents *" "+Item"
+note on link
+    Hashtable<Room,HashSet<Item>>
+end note
+
+"+Dungeon" o-- "-items *" "+Item"
+note on link
+    Hashtable
+end note
+
+@enduml
