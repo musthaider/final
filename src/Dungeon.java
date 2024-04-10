@@ -16,7 +16,8 @@ public class Dungeon {
 
     private String title;
     private Room entry;
-    private Hashtable<String,Room> rooms;
+    Hashtable<String,Room> rooms;
+    private Hashtable<String,Item> items;
     private String filename;
 
     Dungeon(String title, Room entry) {
@@ -24,6 +25,7 @@ public class Dungeon {
         this.title = title;
         this.entry = entry;
         this.rooms = new Hashtable<String,Room>();
+        this.items = new Hashtable<String,Item>();
     }
 
     /**
@@ -33,8 +35,17 @@ public class Dungeon {
     public Dungeon(String filename) throws FileNotFoundException,
         IllegalDungeonFormatException {
 
+        this(filename, false);
+    }
+
+    public Dungeon(String filename, boolean initState)
+        throws FileNotFoundException, IllegalDungeonFormatException {
+
         this.rooms = new Hashtable<String,Room>();
+        this.items = new Hashtable<String,Item>();
         this.filename = filename;
+
+        GameState.instance().setDungeon(this);
 
         Scanner s = new Scanner(new FileReader(filename));
         title = s.nextLine();
@@ -47,6 +58,19 @@ public class Dungeon {
                 "No '===' after version indicator.");
         }
 
+        // Throw away Items starter.
+        if (!s.nextLine().equals("Items:")) {
+            throw new IllegalDungeonFormatException("No '" +
+                "Items:' line where expected.");
+        }
+
+        try {
+            // Instantiate items.
+            while (true) {
+                add(new Item(s));
+            }
+        } catch (Item.NoItemException e) {  /* end of items */ }
+
         // Throw away Rooms starter.
         if (!s.nextLine().equals("Rooms:")) {
             throw new IllegalDungeonFormatException(
@@ -56,12 +80,12 @@ public class Dungeon {
 
         try {
             // Instantiate and add first room (the entry).
-            entry = new Room(s);
+            entry = new Room(s, initState);
             add(entry);
 
             // Instantiate and add other rooms.
             while (true) {
-                add(new Room(s));
+                add(new Room(s, initState));
             }
         } catch (Room.NoRoomException e) {  /* end of rooms */ }
 
@@ -92,7 +116,25 @@ public class Dungeon {
 
     public void add(Room room) { this.rooms.put(room.getName(), room); }
 
+    public void add(Item item) { this.items.put(item.getPrimaryName(),item); }
+
     public Room getRoom(String roomName) {
         return this.rooms.get(roomName); 
+    }
+
+    /**
+     * Get the Item object whose primary name is passed. This has nothing to
+     * do with where the Adventurer might be, or what's in his/her inventory,
+     * etc.
+     */
+    public Item getItem(String primaryItemName) throws Item.NoItemException {
+        
+System.out.println("Getting " + primaryItemName + "...");
+        if (items.get(primaryItemName) == null) {
+System.out.println("Nope!");
+            throw new Item.NoItemException();
+        }
+System.out.println("Yep");
+        return items.get(primaryItemName);
     }
 }

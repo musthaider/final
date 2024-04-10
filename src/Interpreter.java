@@ -4,8 +4,11 @@ import java.util.Scanner;
 
 public class Interpreter {
 
+    private static GameState state; // not strictly necessary; GameState is 
+                                    // singleton
+
     public static String USAGE_MSG = 
-        "Usage: Interpreter dungeonFile.zork|saveFile.sav.";
+        "Usage: Interpreter zorkFile.zork|saveFile.sav.";
 
     public static void main(String args[]) {
 
@@ -18,22 +21,22 @@ public class Interpreter {
         Scanner commandLine = new Scanner(System.in);
 
         try {
+            state = GameState.instance();
             if (args[0].endsWith(".zork")) {
-                GameState.instance().initialize(new Dungeon(args[0]));
+                state.initialize(new Dungeon(args[0], true));
                 System.out.println("\nWelcome to " + 
-                    GameState.instance().getDungeon().getTitle() + "!");
+                    state.getDungeon().getTitle() + "!");
             } else if (args[0].endsWith(".sav")) {
-                GameState.instance().restore(args[0]);
+                state.restore(args[0]);
                 System.out.println("\nWelcome back to " + 
-                    GameState.instance().getDungeon().getTitle() + "!");
+                    state.getDungeon().getTitle() + "!");
             } else {
                 System.err.println(USAGE_MSG);
                 System.exit(2);
             }
 
-            System.out.print("\n" +
-                GameState.instance().getAdventurersCurrentRoom().describe() +
-                "\n");
+            System.out.print("\n" + 
+                state.getAdventurersCurrentRoom().describe() + "\n");
 
             command = promptUser(commandLine);
 

@@ -1,5 +1,6 @@
 
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashSet;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ public class GameState {
     private static GameState theInstance;
     private Dungeon dungeon;
     private Room adventurersCurrentRoom;
+    private ArrayList<Item> inventory;
     private HashSet<Room> visitedRooms;
 
     static synchronized GameState instance() {
@@ -29,6 +31,7 @@ public class GameState {
     }
 
     private GameState() {
+        this.inventory = new ArrayList<Item>();
         this.visitedRooms = new HashSet<Room>();
     }
 
@@ -37,7 +40,7 @@ public class GameState {
 
         Scanner s = new Scanner(new FileReader(filename));
 
-        if (!s.nextLine().equals("Zork II save data")) {
+        if (!s.nextLine().equals("Zork III save data")) {
             throw new IllegalSaveFormatException("Save file not compatible.");
         }
 
@@ -45,42 +48,98 @@ public class GameState {
 
         if (!dungeonFileLine.startsWith("Dungeon file: ")) {
             throw new IllegalSaveFormatException("No '" +
-                "Dungeon file: " + 
-                "' after version indicator.");
+                "Dungeon file:' after version indicator.");
         }
 
-        dungeon = new Dungeon(dungeonFileLine.substring(
-            "Dungeon file: ".length()));
+        this.dungeon = new Dungeon(dungeonFileLine.substring(
+            "Current room: ".length()), false);
 
-        s.nextLine();   // throw away "Room states:"
-        String visitedRoomName = s.nextLine();
-        while (!visitedRoomName.equals("===")) {
-            this.visitedRooms.add(dungeon.getRoom(visitedRoomName));
-            s.nextLine();   // throw away "beenHere=true"
-            s.nextLine();   // throw away "---"
-            visitedRoomName = s.nextLine();
+        s.nextLine();  // Throw away "Room states:".
+        String line = s.nextLine();
+        while (!line.equals("===")) {
+            System.out.println("Room is: " + line.substring(0,line.length()-1));
+            Room r = dungeon.getRoom(
+                line.substring(0,line.length()-1));
+            String beenHereOrNotStr = s.nextLine();
+            boolean beenHereOrNot = Boolean.parseBoolean(
+                beenHereOrNotStr.substring("beenHere=".length()));
+            if (beenHereOrNot) {
+                GameState.instance().visit(r);
+            }
+            line = s.nextLine();  // Maybe throw away "---".
+            if (line.startsWith("Contents: ")) {
+                String contentsList = line.substring("Contents: ".length());
+                String[] contentsItems = contentsList.split(",");
+                for (String itemName : contentsItems) {
+                    try {
+System.out.println("item name is: " + itemName);
+System.out.println("dungeon is: " + dungeon);
+System.out.println("room is: " + r);
+                        r.add(dungeon.getItem(itemName));
+System.out.println("dude");
+                    } catch (Item.NoItemException e) {
+                        throw new IllegalSaveFormatException("No such item '" +
+                            itemName + "'");
+                    }
+                }
+                line = s.nextLine();   // Throw away "---"
+            }
+
+            line = s.nextLine();
         }
-        String currentRoomLine = s.nextLine();
-        adventurersCurrentRoom = dungeon.getRoom(
-            currentRoomLine.substring("Current room: ".length()));
+        line = s.nextLine();
+        this.adventurersCurrentRoom = dungeon.getRoom(
+            line.substring("Current room: ".length()));
+        if (s.hasNext()) {
+            String inventoryList = s.nextLine().substring(
+                "Inventory: ".length());
+            String[] inventoryItems = inventoryList.split(",");
+            for (String itemName : inventoryItems) {
+                try {
+                    this.addToInventory(dungeon.getItem(itemName));
+                } catch (Item.NoItemException e) {
+                    throw new IllegalSaveFormatException("No such item '" +
+                        itemName + "'");
+                }
+            }
+        }
     }
 
     void store(String saveName) throws IOException {
         String filename = this.getFullSaveName(saveName);
         PrintWriter w = new PrintWriter(new FileWriter(filename));
-        w.println("Zork II save data");
+        w.println("Zork III save data");
         w.println("Dungeon file: " + this.getDungeon().getFilename());
         w.println("Room states:");
-        Iterator<Room> visitedRoomsIter = this.visitedRooms.iterator();
-        while (visitedRoomsIter.hasNext()) {
-            Room visitedRoom = visitedRoomsIter.next();
-            w.println(visitedRoom.getName());
-            w.println("beenHere=true");
+        Iterator<Room> rooms = this.dungeon.rooms.values().iterator();
+        while (rooms.hasNext()) {
+            Room room = rooms.next();
+            w.println(room.getName() + ":");
+            if (this.visitedRooms.contains(room)) {
+                w.println("beenHere=true");
+            } else {
+                w.println("beenHere=false");
+            }
+            if (room.contents.size() > 0) {
+                w.print("Contents: ");
+                for (int i=0; i<room.contents.size()-1; i++) {
+                    w.print(room.contents.get(i).getPrimaryName() + ",");
+                }
+                w.println(room.contents.get(
+                    room.contents.size()-1).getPrimaryName());
+            }
             w.println("---");
         }
         w.println("===");
         w.println("Current room: " +
             this.getAdventurersCurrentRoom().getName());
+        if (this.inventory.size() > 0) {
+            w.print("Inventory: ");
+            for (int i=0; i<inventory.size()-1; i++) {
+                w.print(inventory.get(i).getPrimaryName() + ",");
+            }
+            w.println(inventory.get(inventory.size()-1).getPrimaryName());
+        }
         w.close();
     }
 
@@ -96,19 +155,76 @@ public class GameState {
 
     void initialize(Dungeon dungeon) {
         this.dungeon = dungeon;
-        adventurersCurrentRoom = dungeon.getEntry();
+        this.adventurersCurrentRoom = dungeon.getEntry();
+    }
+
+    ArrayList<String> getInventoryNames() {
+        ArrayList<String> names = new ArrayList<String>();
+        for (Item item : this.inventory) {
+            names.add(item.getPrimaryName());
+        }
+        return names;
+    }
+
+    void addToInventory(Item item) /* throws TooHeavyException */ {
+        this.inventory.add(item);
+    }
+
+    void removeFromInventory(Item item) {
+        this.inventory.remove(item);
+    }
+
+    Item getItemInVicinityNamed(String name) throws Item.NoItemException {
+
+        // First, check inventory.
+        for (Item item : this.inventory) {
+            if (item.goesBy(name)) {
+                return item;
+            }
+        }
+
+        // Next, check room contents.
+        for (Item item : this.adventurersCurrentRoom.getContents()) {
+            if (item.goesBy(name)) {
+                return item;
+            }
+        }
+
+        throw new Item.NoItemException();
+    }
+
+    Item getItemFromInventoryNamed(String name) throws Item.NoItemException {
+
+        for (Item item : this.inventory) {
+            if (item.goesBy(name)) {
+                return item;
+            }
+        }
+        throw new Item.NoItemException();
+    }
+
+    int getAdventurersCurrentWeight() {
+        int total = 0;
+        for (Item item : this.inventory) {
+            total += item.getWeight();
+        }
+        return total;
     }
 
     Room getAdventurersCurrentRoom() {
-        return adventurersCurrentRoom;
+        return this.adventurersCurrentRoom;
     }
 
     void setAdventurersCurrentRoom(Room room) {
-        adventurersCurrentRoom = room;
+        this.adventurersCurrentRoom = room;
     }
 
     Dungeon getDungeon() {
-        return dungeon;
+        return this.dungeon;
+    }
+
+    void setDungeon(Dungeon d) {
+        this.dungeon = d;
     }
 
     boolean hasBeenVisited(Room r) {
