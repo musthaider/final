@@ -4,9 +4,7 @@ import java.util.Scanner;
 
 public class Interpreter {
 
-    private static GameState state; // not strictly necessary; GameState is 
-                                    // singleton
-
+    private static GameState state;
     public static String USAGE_MSG = 
         "Usage: Interpreter zorkFile.zork|saveFile.sav.";
 

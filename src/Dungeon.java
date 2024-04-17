@@ -20,6 +20,7 @@ public class Dungeon {
     private Hashtable<String,Item> items;
     private String filename;
     private Hashtable<String, Item> itemsOutOfPlay;
+    private Hashtable<String, Room> teleDests;    
 
     Dungeon(String title, Room entry) {
         this.filename = null;    // null indicates not hydrated from file.
@@ -28,6 +29,7 @@ public class Dungeon {
         this.rooms = new Hashtable<String,Room>();
         this.items = new Hashtable<String,Item>();
         this.itemsOutOfPlay = new Hashtable<String, Item>();
+        this.teleDests = new Hashtable<String, Room>();
     }
 
     /**
@@ -116,10 +118,17 @@ public class Dungeon {
 
     public String getFilename() { return this.filename; }
 
-    public void add(Room room) { this.rooms.put(room.getName(), room); }
+    public void add(Room room) { 
+        this.rooms.put(room.getName(), room); 
+        teleDests.put(room.getTitle(), room);
+}
 
     public void add(Item item) { this.items.put(item.getPrimaryName(),item); }
-
+    
+    public Hashtable<String, Room> getTeleTable() {
+		return teleDests;
+	}
+    
     public void removeItemFromGame(Item item) throws Item.NoItemException {
 		String targetItem = item.getPrimaryName();
 		if (items.get(targetItem) == null) {

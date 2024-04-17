@@ -145,6 +145,9 @@ System.out.println("dude");
             }
             w.println(inventory.get(inventory.size()-1).getPrimaryName());
         }
+        w.println("Health: " + getPlayerHealth());
+        w.println("Score: " + getPlayerScore());
+ 
         w.close();
     }
 
@@ -163,7 +166,7 @@ System.out.println("dude");
         this.adventurersCurrentRoom = dungeon.getEntry();
         this.playerHealth = 100;
         this.logEntry = logEntry;
-        this.playerScore = playerScore
+        this.playerScore = playerScore;
     }
 
     ArrayList<String> getInventoryNames() {

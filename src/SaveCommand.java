@@ -1,7 +1,7 @@
 
 class SaveCommand extends Command {
 
-    private static String DEFAULT_SAVE_FILENAME = "zork";
+    static String DEFAULT_SAVE_FILENAME = "zork";
 
     private String saveFilename;
 
