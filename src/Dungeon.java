@@ -19,6 +19,7 @@ public class Dungeon {
     Hashtable<String,Room> rooms;
     private Hashtable<String,Item> items;
     private String filename;
+    private Hashtable<String, Item> itemsOutOfPlay;
 
     Dungeon(String title, Room entry) {
         this.filename = null;    // null indicates not hydrated from file.
@@ -26,6 +27,7 @@ public class Dungeon {
         this.entry = entry;
         this.rooms = new Hashtable<String,Room>();
         this.items = new Hashtable<String,Item>();
+        this.itemsOutOfPlay = new Hashtable<String, Item>();
     }
 
     /**
@@ -117,6 +119,17 @@ public class Dungeon {
     public void add(Room room) { this.rooms.put(room.getName(), room); }
 
     public void add(Item item) { this.items.put(item.getPrimaryName(),item); }
+
+    public void removeItemFromGame(Item item) throws Item.NoItemException {
+		String targetItem = item.getPrimaryName();
+		if (items.get(targetItem) == null) {
+			throw new Item.NoItemException();
+		} else {
+			itemsOutOfPlay.put(targetItem, item);
+			items.remove(targetItem);
+		}
+
+	}    
 
     public Room getRoom(String roomName) {
         return this.rooms.get(roomName); 

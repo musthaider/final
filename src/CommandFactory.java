@@ -16,6 +16,7 @@ public class CommandFactory {
     }
 
     private CommandFactory() {
+        this.theInstance = theInstance;
     }
 
     public Command parse(String command) {
@@ -37,6 +38,12 @@ public class CommandFactory {
         if (verb.equals("i") || verb.equals("inventory")) {
             return new InventoryCommand();
         }
+        if (verb.equals("h") || verb.equals("health")) {
+			return new HealthCommand();
+		}
+        if (verb.equals("score")) {
+			return new ScoreCommand();
+		}
         if (MOVEMENT_COMMANDS.contains(verb)) {
             return new MovementCommand(verb);
         }

@@ -22,6 +22,10 @@ public class GameState {
     private Room adventurersCurrentRoom;
     private ArrayList<Item> inventory;
     private HashSet<Room> visitedRooms;
+    private int playerScore;
+    private int playerHealth;
+    private ArrayList<String> log;
+    static String logEntry;
 
     static synchronized GameState instance() {
         if (theInstance == null) {
@@ -33,6 +37,7 @@ public class GameState {
     private GameState() {
         this.inventory = new ArrayList<Item>();
         this.visitedRooms = new HashSet<Room>();
+        this.log = new ArrayList<String>();
     }
 
     void restore(String filename) throws FileNotFoundException,
@@ -156,6 +161,9 @@ System.out.println("dude");
     void initialize(Dungeon dungeon) {
         this.dungeon = dungeon;
         this.adventurersCurrentRoom = dungeon.getEntry();
+        this.playerHealth = 100;
+        this.logEntry = logEntry;
+        this.playerScore = playerScore
     }
 
     ArrayList<String> getInventoryNames() {
@@ -203,6 +211,14 @@ System.out.println("dude");
         throw new Item.NoItemException();
     }
 
+    public boolean isItemInPlayerInventory(String itemName) throws Item.NoItemException {
+		Item item = getDungeon().getItem(itemName);
+		if (inventory.contains(item)) {
+			return true;
+		}
+		return false;
+	}
+
     int getAdventurersCurrentWeight() {
         int total = 0;
         for (Item item : this.inventory) {
@@ -234,4 +250,25 @@ System.out.println("dude");
     void visit(Room r) {
         this.visitedRooms.add(r);
     }
+
+    public void setPlayerScore(int newScore) {
+		this.playerScore = newScore;
+	}
+    
+    public int getPlayerScore() {
+		return playerScore;
+	}
+    
+    public int getPlayerHealth() {
+		return playerHealth;
+	}
+
+    public void setPlayerHealth(int playerHealth) {
+		this.playerHealth = playerHealth;
+	}
+
+    public void logAction(String logString) {
+		log.add(logString);
+	}
+
 }
