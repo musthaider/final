@@ -29,7 +29,7 @@ public class TransformEvent extends Event {
 		} else {
 			GameState.instance().getAdventurersCurrentRoom().add(incomingItem);
 			GameState.instance().getAdventurersCurrentRoom().remove(outgoingItem);
-			targetItemOrigin = GameState.instance().getAdventurersCurrentRoom().getTitle();
+			targetItemOrigin = GameState.instance().getAdventurersCurrentRoom().getName();
 
 		}
 		

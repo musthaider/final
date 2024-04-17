@@ -18,6 +18,8 @@ public class GameState {
     }
 
     private static GameState theInstance;
+    public static final String DEFAULT_SAVE_FILE = "zork";
+    public static final String sav = ".sav";
     private Dungeon dungeon;
     private Room adventurersCurrentRoom;
     private ArrayList<Item> inventory;

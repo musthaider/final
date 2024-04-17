@@ -48,6 +48,8 @@ public class Dungeon {
         this.rooms = new Hashtable<String,Room>();
         this.items = new Hashtable<String,Item>();
         this.filename = filename;
+        this.teleDests = new Hashtable<String, Room>();
+        this.itemsOutOfPlay = new Hashtable<String, Item>();
 
         GameState.instance().setDungeon(this);
 
@@ -120,7 +122,7 @@ public class Dungeon {
 
     public void add(Room room) { 
         this.rooms.put(room.getName(), room); 
-        teleDests.put(room.getTitle(), room);
+        this.teleDests.put(room.getName(), room);
 }
 
     public void add(Item item) { this.items.put(item.getPrimaryName(),item); }

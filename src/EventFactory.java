@@ -12,6 +12,7 @@ public class EventFactory {
 	}
 
 	private EventFactory() {
+        this.theInstance = theInstance;
 	}
 
 	public Event parse(String target, String eventDescription) {

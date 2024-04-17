@@ -1,11 +1,12 @@
 Westeros
-Zork III
+Zork++
 ===
 Items:
 dragonglass,glass
 4
-break:Ouch! The glass cuts your hand.
+break[Wound(1)]:Ouch! The glass cuts your hand.
 wield:There's no one here to wield it against.
+throw[Drop,Teleport]:You huck the dragonglass down to the ground, at which point it shatters and leaves you feeling disoriented.
 examine:It's a rough-hewn obsidian sliver, sharp as a needle.
 ---
 BastardSword,sword
@@ -16,28 +17,45 @@ swing:The sword is too heavy for a loser like you to swing.
 dagger
 12
 examine:This sharp assassin's weapon has a dragonbone hilt.
-throw:The dagger clumsily hits the wall.
+throw[Disappear]:The dagger clumsily hits the wall, and breaks to pieces.
 ---
 SapphireNecklace,necklace
 4
 examine:This is a dainty jeweled necklace sparkling blue.
+wear[Score(1)]:Why, you look lovely!
 ---
 wildfire
 2
 examine:This is a curious green liquid. You wonder what would happen if you tried to light it.
-light:The wildfire explodes in a dazzling mushroom cloud, killing you and everyone else in the world. Just kidding.
+light[Die]:The wildfire explodes in a dazzling mushroom cloud, killing you and everyone else in the world.
 ---
 GreenDragonEgg,GreenEgg
 30
 examine:This beautiful egg is a deep green, with burnished bronze flecks that come and go depending on how you turn it.
+heat[Transform(BabyDragon)]:When warmed to great temperatures, the egg hatches and a cute little green dragon emerges! (*spoilers*) You name it "Rhaegal."
+---
+BabyDragon,dragon
+40
+examine:Not Baby Yoda, perhaps, but still pretty cute.
+free[Drop]:The dragon begins to fly on its little wings, and hovers above you approvingly.
+feed[Score(1)]:*Gulp*! The little guy chomps down a small mammal in one gulp.
 ---
 WhiteDragonEgg,WhiteEgg
 30
 examine:This beautiful egg is pale cream, streaked with gold.
+heat[Transform(BabyDragon)]:When warmed to great temperatures, the egg hatches and a cute little green dragon emerges! (*spoilers*) You name it "Viserion."
 ---
 BlackDragonEgg,BlackEgg
 40
-examine:This egg is as black as midnight sea, yet alive with scarlet ripples and swirls. 
+examine:This egg is as black as midnight sea, yet alive with scarlet ripples and swirls.
+heat[Transform(BabyDragon)]:When warmed to great temperatures, the egg hatches and a cute little green dragon emerges! (*spoilers*) You name it "Drogon."
+---
+IronThrone,throne
+400000
+examine:The great metallic throne, forged from a thousand swords of imperial enemies, dominates the room and makes you feel considerably smaller. There are still sharp edges, so you are wary of touching it.
+touch[Wound(1)]:Ouch! Sharp steel opens a red line in your finger.
+sit[Win]:Hail to the Queen!
+sitOn[Win]:Hail to the Queen!
 ---
 ===
 Rooms:
@@ -79,7 +97,7 @@ Moat Cailin
 Great blocks of black basalt lay scattered about, half sunk in the ground,
 where a great wall once stood. A wooden keep, which rotted away a thousand
 years past, and three remaining towers out of a fabled twenty are green with
-moss. 
+moss.
 ---
 North Kingsroad
 You are on a desolate byway that is little more than two narrow dirt tracks.
@@ -140,7 +158,7 @@ are hundreds of mineshafts in the depths of the Rock, as well as yet untouched
 gold veins. From below the Rock thunder can be heard, where the sea comes in.
 ---
 King's Landing
-Contents: wildfire,SapphireNecklace
+Contents: wildfire,SapphireNecklace,IronThrone
 This extraordinary city is extremely populous, but rather unsightly and dirty
 compared to other cities. The city is roughly square-shaped, sprawling across
 several miles and defended by tall walls. Poorer smallfolk build shanty

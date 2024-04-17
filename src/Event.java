@@ -1,6 +1,6 @@
 abstract class Event {
 
-    private String description;
+    private String description = "";
     
     public String getDescription() {
 		return description;

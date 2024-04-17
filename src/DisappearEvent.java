@@ -18,7 +18,7 @@ public class DisappearEvent extends Event {
 
 		} else {
 			GameState.instance().getAdventurersCurrentRoom().remove(targetItem);
-			targetItemOrigin = GameState.instance().getAdventurersCurrentRoom().getTitle();
+			targetItemOrigin = GameState.instance().getAdventurersCurrentRoom().getName();
 		}
 
 		GameState.instance().getDungeon().removeItemFromGame(targetItem);

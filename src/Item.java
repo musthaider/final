@@ -3,6 +3,7 @@ import java.util.Scanner;
 import java.util.Hashtable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class Item {
 
@@ -11,6 +12,7 @@ public class Item {
     private String primaryName;
     private int weight;
     private Hashtable<String,String> messages;
+    private Hashtable<String, String> EventTriggers;
     private Set<String> aliases;
 
 
@@ -18,6 +20,7 @@ public class Item {
         Dungeon.IllegalDungeonFormatException {
 
         this.messages = new Hashtable<String,String>();
+        this.EventTriggers = new Hashtable<String, String>();
         this.aliases = new HashSet<String>();
 
         // Read item name.
@@ -41,11 +44,19 @@ public class Item {
                     "---" + "' after item.");
             }
             String[] verbParts = verbLine.split(":");
-            this.messages.put(verbParts[0],verbParts[1]);
+            if (verbParts[0].contains("[")) {
+		        String eventLine = verbParts[0];
+		        String[] eventParts = eventLine.split(Pattern.quote("["));
+		        EventTriggers.put(eventParts[0], eventParts[1].substring(0, eventParts[1].length() - 1));
+		        messages.put(eventParts[0], verbParts[1]);
+	        } else {
+		            messages.put(verbParts[0], verbParts[1]);
+            }
             
             verbLine = s.nextLine();
         }
     }
+
 
     int getWeight() {
         return weight;
@@ -64,10 +75,16 @@ public class Item {
     }
 
     String getPrimaryName() { return primaryName; }
-
+    
+    public boolean hasEvent(String verb) {
+		return EventTriggers.containsKey(verb);
+	}
     public String getMessageForVerb(String verb) {
         return this.messages.get(verb);
     }
+    public String getEvDetails(String verb) {
+		return EventTriggers.get(verb);
+	}
 
     public String toString() {
         return primaryName;

@@ -3,7 +3,7 @@ class SaveCommand extends Command {
 
     static String DEFAULT_SAVE_FILENAME = "zork";
 
-    private String saveFilename;
+    private String saveFilename = "";
 
     SaveCommand(String saveFilename) {
         if (saveFilename == null || saveFilename.length() == 0) {

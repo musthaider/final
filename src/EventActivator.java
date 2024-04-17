@@ -3,12 +3,11 @@ import java.util.regex.Pattern;
 
 public class EventActivator {
 
-	String eventDetails;
-	Event manualEvent;
-	String EventItem = null;
+	String eventDetails = "";
+    Event manualEvent = null; 
+    String EventItem = null;
 
 	public EventActivator() {
-        this.eventDetails = eventDetails;
     
 	}
 
@@ -16,7 +15,7 @@ public class EventActivator {
 		this.eventDetails = eventDetails;
 		if (eventDetails.startsWith("*")) {
 			String[] eventDetailParts = eventDetails.substring(1).split(Pattern.quote("*"));
-			EventItem = eventDetailParts[0];
+			this.EventItem = eventDetailParts[0];
 			this.eventDetails = eventDetailParts[1];
 		}
 	}
@@ -33,6 +32,10 @@ public class EventActivator {
 		setManualEvent(null);
 		setEventDetails("");
 	}
+
+    public void setEventDetails(String eventDetails) {
+        this.eventDetails = eventDetails;
+    }
 
 	public void activate() throws Item.NoItemException {
 		String[] eventBuffer = eventDetails.split(Pattern.quote(","));

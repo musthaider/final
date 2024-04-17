@@ -1,3 +1,4 @@
+import java.util.regex.Pattern;
 
 class ItemSpecificCommand extends Command {
 
@@ -12,14 +13,23 @@ class ItemSpecificCommand extends Command {
 
     public String execute() {
         
-        Item itemReferredTo = null;
+        Item forItem = null;
         try {
-            itemReferredTo = GameState.instance().getItemInVicinityNamed(noun);
+            forItem = GameState.instance().getItemInVicinityNamed(noun);
         } catch (Item.NoItemException e) {
             return "There's no " + noun + " here.";
         }
         
-        String msg = itemReferredTo.getMessageForVerb(verb);
+	String msg = forItem.getMessageForVerb(verb);
+	if (forItem.hasEvent(verb)) {
+		try {
+			EventActivator EA = new EventActivator("*" + forItem.getPrimaryName() + "*" + forItem.getEvDetails(verb));
+
+        EA.activate();
+     } catch (Item.NoItemException e) {
+	e.printStackTrace();
+	}
+	}
         return (msg == null ? 
             "Sorry, you can't " + verb + " the " + noun + "." : msg) + "\n";
     }

@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Interpreter {
 
-    private static GameState state;
+    private static GameState state = null;
     public static String USAGE_MSG = 
         "Usage: Interpreter zorkFile.zork|saveFile.sav.";
 
@@ -39,6 +39,13 @@ public class Interpreter {
             command = promptUser(commandLine);
 
             while (!command.equals("q")) {
+                  if (state.getPlayerHealth() <= 0) {
+                         DieEvent die = new DieEvent();
+                         die.trigger();
+               } else if (state.getPlayerScore() >= 100) {
+					WinEvent win = new WinEvent();
+					win.trigger();
+				}
 
                 System.out.print(
                     CommandFactory.instance().parse(command).execute());
